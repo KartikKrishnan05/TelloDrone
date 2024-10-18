@@ -13,7 +13,7 @@ parameters.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
 # Initialize Tello drone
 tello = Tello()
 tello.connect()
-
+ 
 # Start video stream
 tello.streamon()
 
