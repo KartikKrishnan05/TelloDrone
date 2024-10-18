@@ -4,8 +4,11 @@ from djitellopy import Tello
 import time
 
 # ArUco marker detection setup
-aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)  # Larger dictionary for more robust detection
 parameters = cv2.aruco.DetectorParameters()
+
+# Enable corner refinement for better detection at angles
+parameters.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
 
 # Initialize Tello drone
 tello = Tello()
@@ -15,7 +18,7 @@ tello.connect()
 tello.streamon()
 
 # Function to detect ArUco marker and get its position
-def detect_aruco_marker(frame):
+def detect_aruco_marker(frame, marker_id=0):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
     # Detect markers
@@ -23,8 +26,8 @@ def detect_aruco_marker(frame):
     corners, ids, _ = detector.detectMarkers(gray)
     
     if ids is not None:
-        for i, marker_id in enumerate(ids):
-            if marker_id == 0:  # We're looking for marker ID 0
+        for i, found_id in enumerate(ids):
+            if found_id == marker_id:  # We're looking for the specific marker ID (default 0)
                 marker_corners = corners[i][0]
                 center_x = int((marker_corners[0][0] + marker_corners[2][0]) / 2)
                 center_y = int((marker_corners[0][1] + marker_corners[2][1]) / 2)
@@ -40,13 +43,12 @@ def detect_aruco_marker(frame):
     return None
 
 
-
 print(f"Battery: {tello.get_battery()}%")
 
-# Takeoff
+# Takeoff and immediately move closer to the floor
 tello.takeoff()
-tello.move_up(130)
-print("Drone has taken off")
+tello.move_down(50)  # Lower the drone's height to improve detection of floor markers
+print("Drone has taken off and moved down closer to the floor")
 
 # Start looking for the marker
 original_position = (0, 0)  # Assume the drone starts at 0,0 position
@@ -54,7 +56,7 @@ marker_found = False
 close_to_marker = False
 
 # Thresholds for when the drone is considered "close enough" to the marker
-CLOSE_ENOUGH_MARKER_SIZE = 225  # Marker size threshold (adjust based on your setup)
+CLOSE_ENOUGH_MARKER_SIZE = 200  # Adjust marker size threshold based on your setup
 FORWARD_STEP_SIZE = 20  # Move forward in smaller steps
 
 try:
@@ -63,7 +65,7 @@ try:
         frame = tello.get_frame_read().frame
         
         # Detect the ArUco marker
-        marker_data = detect_aruco_marker(frame)
+        marker_data = detect_aruco_marker(frame, marker_id=0)  # Change marker_id as needed
 
         # Display the video stream with OpenCV
         cv2.imshow("Tello Camera Feed", frame)
@@ -73,7 +75,7 @@ try:
 
         if marker_data is not None:
             center_x, center_y, marker_size = marker_data
-            print(f"Marker found at position: {center_x, center_y} with size {marker_size}")
+            print(f"Marker found at position: {center_x}, {center_y} with size {marker_size}")
             
             # Move towards the marker
             frame_center_x = frame.shape[1] // 2

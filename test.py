@@ -17,6 +17,8 @@ class FrontEnd(object):
             - Arrow keys: Forward, backward, left and right.
             - A and D: Counter clockwise and clockwise rotations (yaw)
             - W and S: Up and down.
+            - R: Start recording video
+            - F: Stop recording video
     """
 
     def __init__(self):
@@ -43,6 +45,10 @@ class FrontEnd(object):
 
         # Create update timer
         pygame.time.set_timer(pygame.USEREVENT + 1, 1000 // FPS)
+
+        # Video recording attributes
+        self.recording = False  # Flag to indicate recording status
+        self.video_writer = None  # OpenCV VideoWriter object for recording
 
     def run(self):
         self.tello.connect()
@@ -86,6 +92,10 @@ class FrontEnd(object):
             frame = np.rot90(frame)
             frame = np.flipud(frame)
 
+            # If recording is on, write the frame to the video file
+            if self.recording and self.video_writer is not None:
+                self.video_writer.write(cv2.cvtColor(frame_read.frame, cv2.COLOR_BGR2RGB))  # Write the original frame
+
             frame = pygame.surfarray.make_surface(frame)
             self.screen.blit(frame, (0, 0))
             pygame.display.update()
@@ -93,6 +103,9 @@ class FrontEnd(object):
             time.sleep(1 / FPS)
 
         # Call it always before finishing. To deallocate resources.
+        if self.recording:
+            self.stop_recording()  # Stop recording if still on when exiting
+
         self.tello.end()
 
     def keydown(self, key):
@@ -113,6 +126,10 @@ class FrontEnd(object):
             self.yaw_velocity = -S
         elif key == pygame.K_d:  # Yaw clockwise velocity
             self.yaw_velocity = S
+        elif key == pygame.K_r:  # Start recording
+            self.start_recording()
+        elif key == pygame.K_f:  # Stop recording
+            self.stop_recording()
 
     def keyup(self, key):
         """ Update velocities based on key released """
@@ -135,6 +152,24 @@ class FrontEnd(object):
         """ Send velocities to Tello """
         if self.send_rc_control:
             self.tello.send_rc_control(self.left_right_velocity, self.for_back_velocity, self.up_down_velocity, self.yaw_velocity)
+
+    def start_recording(self):
+        """ Start recording the video stream """
+        if not self.recording:
+            print("Recording started")
+            self.recording = True
+            # Initialize the VideoWriter with codec, frame rate, and size
+            self.video_writer = cv2.VideoWriter('drone_recording.avi', cv2.VideoWriter_fourcc(*'XVID'), FPS, (960, 720))
+
+    def stop_recording(self):
+        """ Stop recording the video stream """
+        if self.recording:
+            print("Recording stopped")
+            self.recording = False
+            # Release the video writer
+            if self.video_writer is not None:
+                self.video_writer.release()
+                self.video_writer = None
 
 
 def main():
