@@ -80,12 +80,32 @@ def search_and_fly_to_marker(marker_id, W_real, f):
 
             # Adjust orientation to align horizontally
             if not found_once:
-                if abs(center_x - frame_center_x) > 30:  # Allow for a small tolerance
+                counter = 0
+                if abs(center_x - frame_center_x) > 30: 
+                    
+                
+                    # Allow for a small tolerance
                     if center_x < frame_center_x:
+                        
+                        if counter == 4:
+                            tello.rotate_clockwise(40)
+                            tello.rotate_counter_clockwise(35)
+                            counter = -1
+                        
                         tello.rotate_counter_clockwise(15)
+                        counter = counter +1
                         print("Rotating left to center marker")
+                        
+
                     else:
+                        
+                        if counter == 4:
+                            tello.rotate_clockwise(40)
+                            tello.rotate_counter_clockwise(35)
+                            counter = -1
+                        
                         tello.rotate_clockwise(15)
+                        counter = counter +1
                         print("Rotating right to center marker")
                 else:
                     print("Marker centered horizontally.")
@@ -129,7 +149,7 @@ try:
     f = 77.4     # Estimated focal length in pixels (based on calibration)
     
     # Set the last marker ID (e.g., if the last marker is ID 4)
-    last_marker_id = 0
+    last_marker_id = 2
 
     # Fly through all markers up to the last marker ID
     fly_through_markers(last_marker_id, W_real, f)
