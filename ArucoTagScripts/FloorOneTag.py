@@ -77,14 +77,14 @@ def search_and_fly_to_marker(marker_id, last_marker_id):
             frame_center_x = frame.shape[1] // 2
             frame_center_y = frame.shape[0] // 2
             
-            # Align horizontally
+            # Rotate to align with the marker horizontally
             if abs(center_x - frame_center_x) > 30:
                 if center_x < frame_center_x:
-                    tello.move_left(20)
-                    print("Moving left")
+                    tello.rotate_counter_clockwise(20)
+                    print("Rotating left")
                 else:
-                    tello.move_right(20)
-                    print("Moving right")
+                    tello.rotate_clockwise(20)
+                    print("Rotating right")
             
             # Move forward if not yet close enough to the marker
             if marker_size < CLOSE_ENOUGH_MARKER_SIZE:
