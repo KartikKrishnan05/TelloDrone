@@ -100,7 +100,7 @@ def search_and_fly_to_marker(marker_id, W_real, f):
                     print(f"Close enough to marker {marker_id}, stopping movement.")
                 
                 # Perform a backflip after reaching the marker
-                tello.rotate_clockwise(360)
+                
 
                 break  # Break out of the loop once the movement is complete
         
@@ -136,6 +136,7 @@ try:
 
 finally:
     # Land the drone
+    tello.rotate_clockwise(360)
     tello.land()
     print("Drone has landed")
 
