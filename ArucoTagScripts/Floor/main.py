@@ -14,9 +14,9 @@ tello.connect()
 # Start video stream
 tello.streamon()
 
-# Distance calculation formula: d = (W_real * f) / w_pixel
+# Distance calculation formula: d = (real_width * focallength) / pixel_width
 def calculate_distance(W_real, f, w_pixel):
-    return ((W_real * f) / w_pixel) * 10  # Multiplied by 10 to convert to cm
+    return ((W_real * f) / w_pixel) * 10 
 
 # Function to detect ArUco marker and calculate its width, height, and distance
 def detect_aruco_marker(frame, marker_id, W_real, f):
@@ -35,7 +35,7 @@ def detect_aruco_marker(frame, marker_id, W_real, f):
                 marker_width = np.linalg.norm(marker_corners[0] - marker_corners[1])
                 marker_height = np.linalg.norm(marker_corners[1] - marker_corners[2])
                 
-                # Calculate distance using width (you could also use height similarly)
+                # Calculate distance using width 
                 distance = calculate_distance(W_real, f, marker_width)
                 
                 # Draw the detected marker on the frame for visualization
@@ -90,11 +90,11 @@ def search_and_fly_to_marker(marker_id, W_real, f):
                     if center_x < frame_center_x:
                         
                         if counter >= 4:
-                            print("plan B1")
+                            print("plan B")
                             tello.rotate_counter_clockwise(40)
                             tello.rotate_clockwise(35)
                             found_once = True
-                            counter = 0v
+                            counter = 0
 
                         tello.rotate_counter_clockwise(10)
                         counter = counter + 1
@@ -103,7 +103,7 @@ def search_and_fly_to_marker(marker_id, W_real, f):
                     else:
                         
                         if counter >= 4:
-                            print("plan B2")
+                            print("plan B")
                             tello.rotate_clockwise(40)
                             tello.rotate_counter_clockwise(35)
                             found_once = True
@@ -124,11 +124,8 @@ def search_and_fly_to_marker(marker_id, W_real, f):
                 else:
                     print(f"Close enough to marker {marker_id}, stopping movement.")
                 
-                # Perform a backflip after reaching the marker
                 
-
-                break  # Break out of the loop once the movement is complete
-        
+                break  
         else:
             print(f"Marker {marker_id} not found, rotating...")
             tello.rotate_clockwise(10)
