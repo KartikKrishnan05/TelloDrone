@@ -57,6 +57,7 @@ def display_battery_on_frame(frame, battery_level):
 # Function to search for and fly to markers
 def search_and_fly_to_marker(marker_id, W_real, f):
     found_once = False  # To track if the marker was found
+    counter = 0
     while True:
         frame = tello.get_frame_read().frame
         battery_level = tello.get_battery()  # Get the current battery level
@@ -78,34 +79,38 @@ def search_and_fly_to_marker(marker_id, W_real, f):
             
             frame_center_x = frame.shape[1] // 2  # Center of the frame
 
+            
+
             # Adjust orientation to align horizontally
             if not found_once:
-                counter = 0
-                if abs(center_x - frame_center_x) > 30: 
-                    
                 
+                if abs(center_x - frame_center_x) > 30: 
+                    print(f"                 counter: {counter}")
                     # Allow for a small tolerance
                     if center_x < frame_center_x:
                         
-                        if counter == 4:
-                            tello.rotate_clockwise(40)
-                            tello.rotate_counter_clockwise(35)
-                            counter = -1
-                        
-                        tello.rotate_counter_clockwise(15)
-                        counter = counter +1
+                        if counter >= 4:
+                            print("plan B1")
+                            tello.rotate_counter_clockwise(40)
+                            tello.rotate_clockwise(35)
+                            found_once = True
+                            counter = 0v
+
+                        tello.rotate_counter_clockwise(10)
+                        counter = counter + 1
                         print("Rotating left to center marker")
                         
-
                     else:
                         
-                        if counter == 4:
+                        if counter >= 4:
+                            print("plan B2")
                             tello.rotate_clockwise(40)
                             tello.rotate_counter_clockwise(35)
-                            counter = -1
+                            found_once = True
+                            counter = 0
                         
-                        tello.rotate_clockwise(15)
-                        counter = counter +1
+                        tello.rotate_clockwise(10)
+                        counter = counter + 1
                         print("Rotating right to center marker")
                 else:
                     print("Marker centered horizontally.")
@@ -126,7 +131,7 @@ def search_and_fly_to_marker(marker_id, W_real, f):
         
         else:
             print(f"Marker {marker_id} not found, rotating...")
-            tello.rotate_clockwise(15)
+            tello.rotate_clockwise(10)
         
         # Ensure that the frame stays on screen
         if cv2.waitKey(1) & 0xFF == ord('q'):
