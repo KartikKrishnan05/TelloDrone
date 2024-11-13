@@ -58,7 +58,7 @@ def display_battery_on_frame(frame, battery_level):
     cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 # Function to search for and fly to markers
-def search_and_fly_to_marker(marker_id, W_real, f):
+def search_and_fly_to_marker(marker_id, W_real, f, direction):
     found_once = False  # To track if the marker was found
     counter = 0
     while True:
@@ -130,7 +130,10 @@ def search_and_fly_to_marker(marker_id, W_real, f):
                 break  # Break the loop after reaching the marker
         else:
             print(f"Marker {marker_id} not found, rotating...")
-            tello.rotate_clockwise(10)
+            if (direction == 0):
+                tello.rotate_clockwise(10)
+            else: 
+                tello.rotate_counter_clockwise(10)
             flight_log.append(('rotate_cw', 10))  # Log the rotation
         
         # Ensure that the frame stays on screen
@@ -209,9 +212,9 @@ def fly_back():
             print(f"Rotating clockwise by {value} degrees")
 
 # Main function to fly through all markers till the last one
-def fly_through_markers(first_marker, last_marker_id, W_real, f):
+def fly_through_markers(first_marker, last_marker_id, W_real, f, direction):
     for marker_id in range(first_marker, last_marker_id + 1):  # Loop through marker IDs starting from 0
-        search_and_fly_to_marker(marker_id, W_real, f)
+        search_and_fly_to_marker(marker_id, W_real, f, direction)
     fly_back()  # Fly back after reaching the last marker
 
 # Takeoff and immediately move closer to the floor
@@ -232,12 +235,14 @@ try:
     first_maker_id = 0
 
     # Fly through all markers up to the last marker ID
-    fly_through_markers(first_maker_id, last_marker_id, W_real, f)
+    fly_through_markers(first_maker_id, last_marker_id, W_real, f, 0)
 
 finally:
     # Land the drone
 
-    fly_through_markers(3, 3, 20, 77.4)
+    tello.move_up(20)
+
+    fly_through_markers(3, 3, 20, 77.4, 1)
 
     tello.land()
     print("Drone has landed")
