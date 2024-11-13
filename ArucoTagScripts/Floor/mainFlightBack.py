@@ -172,13 +172,32 @@ def combine_consecutive_turns(flight_log):
 
     return optimized_log
 
+
+def iter_drop_n(data):
+    result = []
+    first = True
+
+    for command, value in data: 
+        if command == 'move_forward' and first:
+            first = False
+        elif not first:
+            result.append((command, value)) 
+
+    return result
+
+
+
+
 # Function to fly back along the logged route
 def fly_back():
     print("Turning around and flying back along the recorded route...")
     optimized_log = combine_consecutive_turns(flight_log)  # Optimize consecutive turns
+    print(optimized_log)
+    new_optimized_log = iter_drop_n(optimized_log)
+    new_optimized_log = new_optimized_log[1:]
     tello.rotate_clockwise(180)  # Rotate 180° to face the starting direction
     
-    for command, value in reversed(optimized_log):
+    for command, value in reversed(new_optimized_log):
         if command == 'move_forward':
             tello.move_forward(value)  # Fly forward by the logged distance (since we rotated)
             print(f"Flying forward by {value} cm")
@@ -190,14 +209,15 @@ def fly_back():
             print(f"Rotating clockwise by {value} degrees")
 
 # Main function to fly through all markers till the last one
-def fly_through_markers(last_marker_id, W_real, f):
-    for marker_id in range(last_marker_id + 1):  # Loop through marker IDs starting from 0
+def fly_through_markers(first_marker, last_marker_id, W_real, f):
+    for marker_id in range(first_marker, last_marker_id + 1):  # Loop through marker IDs starting from 0
         search_and_fly_to_marker(marker_id, W_real, f)
     fly_back()  # Fly back after reaching the last marker
 
 # Takeoff and immediately move closer to the floor
 print(f"Battery: {tello.get_battery()}%")
 tello.takeoff()
+time.sleep(500 / 1000)
 tello.move_down(20)
 print("Drone has taken off and moved down closer to the floor")
 
@@ -209,11 +229,16 @@ try:
     # Set the last marker ID (e.g., if the last marker is ID 4)
     last_marker_id = 2
 
+    first_maker_id = 0
+
     # Fly through all markers up to the last marker ID
-    fly_through_markers(last_marker_id, W_real, f)
+    fly_through_markers(first_maker_id, last_marker_id, W_real, f)
 
 finally:
     # Land the drone
+
+    fly_through_markers(3, 3, 20, 77.4)
+
     tello.land()
     print("Drone has landed")
 
