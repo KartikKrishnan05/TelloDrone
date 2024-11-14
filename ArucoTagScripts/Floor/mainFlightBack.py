@@ -215,7 +215,8 @@ def fly_back():
 def fly_through_markers(first_marker, last_marker_id, W_real, f, direction):
     for marker_id in range(first_marker, last_marker_id + 1):  # Loop through marker IDs starting from 0
         search_and_fly_to_marker(marker_id, W_real, f, direction)
-    fly_back()  # Fly back after reaching the last marker
+    if (direction == 0): 
+        fly_back()  # Fly back after reaching the last marker
 
 # Takeoff and immediately move closer to the floor
 print(f"Battery: {tello.get_battery()}%")
@@ -240,7 +241,7 @@ try:
 finally:
     # Land the drone
 
-    tello.move_up(20)
+     
 
     fly_through_markers(3, 3, 20, 77.4, 1)
 
