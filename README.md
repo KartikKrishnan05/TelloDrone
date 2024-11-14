@@ -1,9 +1,14 @@
 # TelloDrone
 
 # English 
-Today, we are presenting a demonstration of how drones can be used for autonomous data collection. Our drone takes off independently, recognizes its surroundings with the help of ArUco tags, and navigates from one tag to the next. These flight maneuvers simulate the data collection process at various stations, for instance, in agriculture, environmental monitoring, or in the realm of smart cities.
+Today, we are presenting a demonstration of how drones can be used for autonomous data collection. Our drone takes off independently, recognizes its surroundings with the help of ArUco tags, and navigates from one tag to the next. 
+
+These flight maneuvers simulate the data collection process at various stations, for instance, in agriculture, environmental monitoring, or in the realm of smart cities.
+
 An especially exciting application area is the integration of drones into a Wireless Sensor Network (WSN). In such networks, numerous sensor stations are installed across a large area, collecting data such as temperature, humidity, or environmental parameters. Normally, these stations must transmit their data wirelessly over long distances, which requires significant energy and shortens the battery life of the stations.
+
 This is where the drone comes into play: instead of transmitting data over long distances, the drone flies regularly, for example once a day, to each station to wirelessly retrieve the collected data. This method not only saves power and extends the battery life of the sensors but also reduces the need to constantly replace the batteries. The drone functions as a mobile data transmission system, enhancing the efficiency of the entire network.
+
 This approach illustrates how drones can play a central role in modern technologies like the Wireless Sensor Network by increasing energy efficiency while simplifying the data collection process.
 
 
