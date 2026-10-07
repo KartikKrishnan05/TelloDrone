@@ -1,22 +1,57 @@
 # TelloDrone
 
-# English 
-Today, we are presenting a demonstration of how drones can be used for autonomous data collection. Our drone takes off independently, recognizes its surroundings with the help of ArUco tags, and navigates from one tag to the next. 
+Autonomous indoor flight with a DJI Tello drone using **ArUco markers** for navigation. The drone takes off on its own, finds markers with its camera, flies from one marker to the next, and returns — a demo of how drones could collect data from stations in a **Wireless Sensor Network**.
 
-These flight maneuvers simulate the data collection process at various stations, for instance, in agriculture, environmental monitoring, or in the realm of smart cities.
+## Why
 
-An especially exciting application area is the integration of drones into a Wireless Sensor Network (WSN). In such networks, numerous sensor stations are installed across a large area, collecting data such as temperature, humidity, or environmental parameters. Normally, these stations must transmit their data wirelessly over long distances, which requires significant energy and shortens the battery life of the stations.
+In a wireless sensor network, stations spread over a large area (farms, forests, cities) measure things like temperature or humidity. Sending that data over long distances costs a lot of energy and drains their batteries. Instead, a drone can fly to each station on a schedule — say once a day — and pick up the data at short range. The stations save power, batteries last longer, and the drone becomes a mobile data link.
 
-This is where the drone comes into play: instead of transmitting data over long distances, the drone flies regularly, for example once a day, to each station to wirelessly retrieve the collected data. This method not only saves power and extends the battery life of the sensors but also reduces the need to constantly replace the batteries. The drone functions as a mobile data transmission system, enhancing the efficiency of the entire network.
+In this project, ArUco markers stand in for the sensor stations.
 
-This approach illustrates how drones can play a central role in modern technologies like the Wireless Sensor Network by increasing energy efficiency while simplifying the data collection process.
+## How it works
 
+1. The drone streams video over Wi-Fi; OpenCV detects ArUco markers in each frame.
+2. The marker's position in the image tells the drone which way to correct (left/right, up/down), and the marker's size in pixels gives the distance using the pinhole camera model: `distance = real_width × focal_length / pixel_width`.
+3. If the next marker isn't visible, the drone rotates in place to search for it.
+4. Once it reaches a marker it moves on to the next ID; at the end it flies back and lands.
 
-# Deutsch 
-Heute präsentieren wir eine Demonstration, wie Drohnen zur autonomen Datenerfassung eingesetzt werden können. Unsere Drohne startet selbstständig, erkennt mit Hilfe von ArUco-Tags ihre Umgebung und navigiert von einem Tag zum nächsten. Diese Flugbewegungen simulieren den Prozess der Datenerfassung an verschiedenen Stationen, beispielsweise in der Landwirtschaft, Umweltüberwachung oder im Bereich der Smart Cities.
+## Scripts
 
-Ein besonders spannendes Einsatzgebiet ist die Integration von Drohnen in ein Wireless Sensor Network (WSN). In solchen Netzwerken sind zahlreiche, über ein großes Gebiet verteilte Sensorstationen installiert, die Daten wie Temperatur, Feuchtigkeit oder Umweltparameter erfassen. Normalerweise müssen diese Stationen ihre Daten drahtlos über große Entfernungen übertragen, was einen hohen Energieaufwand erfordert und die Batterielebensdauer der Stationen verkürzt.
+| Path | What it does |
+| --- | --- |
+| `ArucoTagScripts/Floor/main.py` | Main demo: fly to markers on the floor and measure distance to them |
+| `ArucoTagScripts/Floor/FloorOneTag.py`, `FloorMultipleTags.py` | Find and fly to one marker / a sequence of markers on the floor |
+| `ArucoTagScripts/Floor/mainFlightBack.py` | Marker route with a return flight, flight log and battery display |
+| `ArucoTagScripts/Floor/findX.py` | Centre the drone over an "X" mark on the floor |
+| `ArucoTagScripts/Wall/OneTag.py`, `TagsOnWall.py` | The same with markers mounted on a wall |
+| `ArucoTagScripts/ArucoTag/createTags.py` | Generate printable markers (4×4 and 6×6 dictionaries in `aruco_tags_*`) |
+| `ArucoTagScripts/ArucoTag/getSize.py` | Measure a marker's pixel size to calibrate the distance formula |
+| `keyboard_control.py` | Fly manually with the keyboard (pygame window with live video) |
+| `changeSTAmode/` | Put the Tello on an existing Wi-Fi router (station mode) and scan the network to find it, for multi-drone setups |
+| `checkcv2.py` | Check that your OpenCV build includes the ArUco module |
 
-Hier kommt die Drohne ins Spiel: Statt die Daten über lange Strecken zu übertragen, fliegt die Drohne regelmäßig, zum Beispiel einmal täglich, zu jeder Station, um die gesammelten Daten kabellos abzurufen. Diese Methode spart nicht nur Strom und verlängert die Batterielaufzeit der Sensoren, sondern reduziert auch die Notwendigkeit, die Batterien ständig auszutauschen. Die Drohne fungiert als mobiles Datenübertragungssystem und verbessert die Effizienz des gesamten Netzwerks.
+## Getting started
 
-Dieser Ansatz zeigt, wie Drohnen eine zentrale Rolle in modernen Technologien wie dem Wireless Sensor Network spielen können, indem sie die Energieeffizienz steigern und gleichzeitig den Datenerfassungsprozess vereinfachen.
+```bash
+pip install djitellopy opencv-contrib-python numpy pygame
+```
+
+1. Print the markers from `ArucoTagScripts/ArucoTag/aruco_tags_6x6/` and place them around the room.
+2. Turn on the Tello and connect your computer to its Wi-Fi.
+3. Run a flight script, e.g.
+
+   ```bash
+   python ArucoTagScripts/Floor/main.py
+   ```
+
+To connect the drone to your own router instead:
+
+```bash
+python changeSTAmode/tello_connect_wifi.py "<router-ssid>" "<router-password>"
+```
+
+> Fly in an open space and keep a hand near the keyboard — the scripts send real movement commands.
+
+## Team
+
+Kartik Krishnan and Emirhan Afsin, 2024.

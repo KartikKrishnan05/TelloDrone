@@ -1,8 +1,11 @@
+import sys
+
 from djitellopy import Tello
 
-# Replace with your Wi-Fi network SSID and password
-wifi_ssid = "TP_LinkF4D0"  # Your router's SSID (network name)
-wifi_password = "05229611"  # Your router's password
+# Usage: python change_nt_type.py <router-ssid> <router-password>
+if len(sys.argv) != 3:
+    sys.exit("usage: python change_nt_type.py <router-ssid> <router-password>")
+wifi_ssid, wifi_password = sys.argv[1], sys.argv[2]
 
 # Initialize Tello
 tello = Tello()

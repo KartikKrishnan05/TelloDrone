@@ -40,5 +40,10 @@ def connect_tello_to_router(router_ssid, router_password):
     # Close the socket
     sock.close()
 
-# Example usage
-connect_tello_to_router('TP-Link_F4D0', '05229611')
+# Usage: python tello_connect_wifi.py <router-ssid> <router-password>
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 3:
+        sys.exit("usage: python tello_connect_wifi.py <router-ssid> <router-password>")
+    connect_tello_to_router(sys.argv[1], sys.argv[2])
